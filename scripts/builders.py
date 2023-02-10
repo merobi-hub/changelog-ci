@@ -86,12 +86,16 @@ class PullRequestChangelogBuilder(ChangelogBuilderBase):
     def _get_changelog_line(file_type: str, item: dict[str, Any]) -> str:
         """Generate each line of the changelog"""
         if file_type == MARKDOWN_FILE:
-            changelog_line_template = "* [#{number}]({url}): {title}\n"
+            changelog_line_template = "* [#{number}]({url}): {title} by [{author}]({author_url})\n"
         else:
-            changelog_line_template = "* `#{number} <{url}>`__: {title}\n"
+            changelog_line_template = "* `#{number} <{url}>`__: {title} by `{author} <{author_url}>`\n"
 
         return changelog_line_template.format(
-            number=item["number"], url=item["url"], title=item["title"]
+            number=item["number"], 
+            url=item["url"], 
+            title=item["title"], 
+            author=item["user"]["login"], 
+            author_url=item["user"]["html_url"]
         )
 
     def _get_changes_after_last_release(self) -> list[dict[str, str | int | list[str]]]:
