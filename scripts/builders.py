@@ -138,8 +138,8 @@ class PullRequestChangelogBuilder(ChangelogBuilderBase):
                 for item in response_data["items"]:
                     data = {
                         "title": item["title"],
-                        "author": [user["login"] for user in item["user"]],
-                        "author_url": [user["html_url"] for user in item["user"]],
+                        "author": item["user"][0]["login"],
+                        "author_url": item["user"][0]["html_url"],
                         "number": item["number"],
                         "url": item["html_url"],
                         "labels": [label["name"] for label in item["labels"]],
