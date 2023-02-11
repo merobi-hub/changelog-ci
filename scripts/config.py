@@ -18,24 +18,12 @@ UserConfigType = dict[str, str | bool | list[dict[str, str | list[str]]] | None]
 
 
 class ActionEnvironment(NamedTuple):
-    event_path: str
     repository: str
-    pull_request_branch: str
-    base_branch: str
-    event_name: str
-    event_payload: dict[str, Any]
-    github_workspace: str
 
     @classmethod
     def from_env(cls, env: Mapping[str, str]) -> "ActionEnvironment":
         return cls(
-            event_path=env["GITHUB_EVENT_PATH"],
             repository=env["GITHUB_REPOSITORY"],
-            pull_request_branch=env["GITHUB_HEAD_REF"],
-            base_branch=env["GITHUB_REF"],
-            event_name=env["GITHUB_EVENT_NAME"],
-            event_payload=gha_utils.event_payload(),
-            github_workspace=env["GITHUB_WORKSPACE"],
         )
 
 
@@ -65,7 +53,8 @@ class Configuration(NamedTuple):
 
     git_committer_username: str = "github-actions[bot]"
     git_committer_email: str = "github-actions[bot]@users.noreply.github.com"
-    release_version: str | None = None
+    end_version: str | None = None
+    start_version: str | None = None
     github_token: str | None = None
 
     @property
@@ -97,58 +86,12 @@ class Configuration(NamedTuple):
         """
         user_config: UserConfigType = {
             "changelog_filename": env.get("INPUT_CHANGELOG_FILENAME"),
-            "git_committer_username": env.get("INPUT_COMMITTER_USERNAME"),
-            "git_committer_email": env.get("INPUT_COMMITTER_EMAIL"),
-            "release_version": env.get("INPUT_RELEASE_VERSION"),
+            "end_version": env.get("END_RELEASE_VERSION"),
+            "start_version": env.get("START_RELEASE_VERSION"),
             "github_token": env.get("INPUT_GITHUB_TOKEN"),
         }
-        config_file_path = env.get("INPUT_CONFIG_FILE")
-
-        if not config_file_path:
-            gha_utils.warning(
-                "No Configuration file found, "
-                "falling back to default configuration to parse changelog"
-            )
-            return user_config
-
-        config_file_data = cls.get_config_file_data(config_file_path)
-        user_config.update(config_file_data)
 
         return user_config
-
-    @staticmethod
-    def get_config_file_data(config_file_path: str) -> UserConfigType:
-        """
-        Open config file and return file data
-        """
-        loader: Callable[[TextIO], dict[str, Any]]
-        config_file_data: dict[str, Any] = {}
-
-        try:
-            # parse config files with the extension .yml and .yaml
-            # using YAML syntax
-            if config_file_path.endswith("yml") or config_file_path.endswith("yaml"):
-                loader = yaml.safe_load
-            # parse config files with the extension .json
-            # using JSON syntax
-            elif config_file_path.endswith("json"):
-                loader = json.load
-            else:
-                gha_utils.error(
-                    "We only support `JSON` or `YAML` file for configuration "
-                    "falling back to default configuration to parse changelog"
-                )
-                return config_file_data
-
-            with open(config_file_path, "r") as file:
-                config_file_data = loader(file)
-
-        except Exception as e:
-            gha_utils.error(
-                f"Invalid Configuration file, error: {e}, "
-                "falling back to default configuration to parse changelog"
-            )
-        return config_file_data
 
     @classmethod
     def clean_user_config(cls, user_config: dict[str, Any]) -> dict[str, Any]:
@@ -320,7 +263,16 @@ class Configuration(NamedTuple):
             return None
 
     @classmethod
-    def clean_release_version(cls, value: Any) -> str | None:
+    def clean_start_version(cls, value: Any) -> str | None:
+        """clean release_version item configuration option"""
+        if value and isinstance(value, str):
+            return value
+        else:
+            gha_utils.notice("`release_version` was not provided as an input.")
+            return None
+
+    @classmethod
+    def clean_end_version(cls, value: Any) -> str | None:
         """clean release_version item configuration option"""
         if value and isinstance(value, str):
             return value
