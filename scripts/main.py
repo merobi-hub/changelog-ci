@@ -9,7 +9,6 @@ import requests
 
 from builders import (
     ChangelogBuilderBase,
-    CommitMessageChangelogBuilder,
     PullRequestChangelogBuilder,
 )
 from config import (
@@ -71,8 +70,6 @@ class ChangelogCIBase(abc.ABC):
         """Get changelog Builder"""
         if config.changelog_type == PULL_REQUEST:
             return PullRequestChangelogBuilder(config, action_env, release_version)
-        elif config.changelog_type == COMMIT_MESSAGE:
-            return CommitMessageChangelogBuilder(config, action_env, release_version)
         else:
             raise ValueError(f"Unknown changelog type: {config.changelog_type}")
 
