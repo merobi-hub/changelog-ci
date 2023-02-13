@@ -94,8 +94,8 @@ class PullRequestChangelogBuilder(ChangelogBuilderBase):
             number=item["number"], 
             url=item["url"], 
             title=item["title"], 
-            author=item["user"]["login"], 
-            author_url=item["user"]["html_url"]
+            author=item["author"], 
+            author_url=item["author_url"]
         )
 
     def _get_changes_after_last_release(self) -> list[dict[str, str | int | list[str]]]:
@@ -138,8 +138,8 @@ class PullRequestChangelogBuilder(ChangelogBuilderBase):
                 for item in response_data["items"]:
                     data = {
                         "title": item["title"],
-                        "author": [user["login"] for user in item["user"]],
-                        "author_url": [user["html_url"] for user in item["user"]],
+                        "author": item["user"]["login"],
+                        "author_url": item["user"]["html_url"],
                         "number": item["number"],
                         "url": item["html_url"],
                         "labels": [label["name"] for label in item["labels"]],
