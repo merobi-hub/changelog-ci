@@ -7,6 +7,8 @@ import requests
 from config import MARKDOWN_FILE, ActionEnvironment, Configuration
 from utils import get_request_headers
 
+import datetime
+
 
 class ChangelogBuilderBase:
     """Base Class for Changelog Builder"""
@@ -99,15 +101,20 @@ class PullRequestChangelogBuilder(ChangelogBuilderBase):
     def _get_changes_between_releases(self) -> list[dict[str, str | int | list[str]]]:
         """Get all the merged pull request after latest release"""
         start_release_date = self._get_release_date(self.config.start_version)
-        end_release_date = self._get_release_date(self.config.end_version)
+        try:
+            end_release_date = self._get_release_date(self.config.end_version)
+        except:
+            end_release_date = ""
 
         if start_release_date and end_release_date:
             merged_date_filter = "merged:" + start_release_date + ".." + end_release_date
+        elif start_release_date:
+            merged_date_filter = "merged:" + start_release_date + ".." + datetime.datetime.now().isoformat("T", "milliseconds")
         else:
             # if there is no release for the repo then
             # do not filter by merged date
             merged_date_filter = ""
-
+        
         # Detail on the GitHub Search API:
         # https://docs.github.com/en/rest/search#search-issues-and-pull-requests
         # https://docs.github.com/en/search-github/searching-on-github/searching-issues-and-pull-requests
