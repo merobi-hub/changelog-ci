@@ -49,7 +49,7 @@ class Configuration(NamedTuple):
     exclude_labels: list[str] = []
     include_unlabeled_changes: bool = True
     unlabeled_group_title: str = "Other Changes"
-    changelog_filename: str = f"CHANGELOG.{MARKDOWN_FILE}"
+    changelog_filename: str = f"../CHANGELOG.{MARKDOWN_FILE}"
 
     git_committer_username: str = "github-actions[bot]"
     git_committer_email: str = "github-actions[bot]@users.noreply.github.com"
