@@ -30,7 +30,7 @@ class ActionEnvironment(NamedTuple):
 class Configuration(NamedTuple):
     """Configuration class for Changelog CI"""
 
-    header_prefix: str = "Version:"
+    header_prefix: str = "All changes in "
     commit_changelog: bool = True
     comment_changelog: bool = False
     pull_request_title_regex: str = r"^(?i:release)"
@@ -49,7 +49,7 @@ class Configuration(NamedTuple):
     exclude_labels: list[str] = []
     include_unlabeled_changes: bool = True
     unlabeled_group_title: str = "Other Changes"
-    changelog_filename: str = f"../CHANGELOG.{MARKDOWN_FILE}"
+    changelog_filename: str = f"CHANGELOG.{MARKDOWN_FILE}"
 
     git_committer_username: str = "github-actions[bot]"
     git_committer_email: str = "github-actions[bot]@users.noreply.github.com"
