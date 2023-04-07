@@ -30,7 +30,7 @@ class ActionEnvironment(NamedTuple):
 class Configuration(NamedTuple):
     """Configuration class for Changelog CI"""
 
-    header_prefix: str = "All changes in "
+    header_prefix: str = "All changes in"
     commit_changelog: bool = True
     comment_changelog: bool = False
     pull_request_title_regex: str = r"^(?i:release)"
